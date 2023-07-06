@@ -1,5 +1,13 @@
 'use strict';
 const { Model } = require('sequelize');
+
+const { v1 } = require('uuid');
+
+const uuid = () => {
+  const tokens = v1().split('-');
+  return tokens[2] + tokens[1] + tokens[0] + tokens[3] + tokens[4];
+};
+
 module.exports = (sequelize, DataTypes) => {
   class Users extends Model {
     /**
@@ -29,7 +37,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       userId: {
         type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
+        defaultValue: () => uuid(),
         allowNull: false,
         primaryKey: true,
       },

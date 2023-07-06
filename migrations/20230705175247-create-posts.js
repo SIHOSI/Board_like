@@ -1,11 +1,19 @@
 'use strict';
+
+const { v1 } = require('uuid');
+
+const uuid = () => {
+  const tokens = v1().split('-');
+  return tokens[2] + tokens[1] + tokens[0] + tokens[3] + tokens[4];
+};
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('Posts', {
       postId: {
         type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4,
+        defaultValue: Sequelize.literal(`'${uuid()}'`),
         allowNull: false,
         primaryKey: true,
       },

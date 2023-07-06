@@ -19,7 +19,7 @@ router.post('/signup', async (req, res) => {
     const user = await Users.findOne({
       where: { nickname: nickname },
     });
-    if (!user) {
+    if (user) {
       return res.status(401).json({ message: '이미 존재하는 닉네임.' });
     }
 
@@ -33,11 +33,11 @@ router.post('/signup', async (req, res) => {
     }
 
     // 비밀번호 암호화
-    const hasedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await Users.create({
       nickname: nickname,
-      password: hasedPassword,
+      password: hashedPassword,
     });
 
     res.status(201).json({ message: '회원가입 완료', newUser });
