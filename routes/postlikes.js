@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const authMiddleware = require('../middlewares/auth-middleware');
-const Sequelize = require('sequelize');
 const { Posts, PostLikes, Users } = require('../models');
 
 // 게시글 좋아요 API
