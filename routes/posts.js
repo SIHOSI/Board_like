@@ -6,6 +6,7 @@ const { Posts } = require('../models');
 // 게시글 작성 API
 router.post('/posts', authMiddleware, async (req, res) => {
   const { title, content } = req.body;
+  const { user } = res.locals;
 
   try {
     if (!title || !content) {
@@ -13,9 +14,9 @@ router.post('/posts', authMiddleware, async (req, res) => {
     }
 
     const newPost = await Posts.create({
-      title: title,
-      content: content,
-      userId: req.locals.user.userId,
+      postTitle: title, // 수정된 부분
+      postContent: content,
+      UserId: user.userId,
     });
 
     res.status(201).json({ message: '게시글 작성 완료', newPost });
@@ -26,10 +27,12 @@ router.post('/posts', authMiddleware, async (req, res) => {
 });
 
 // 사용자 작성 글 불러오기 API
-router.get('/posts', authMiddleware, async (req, res) => {
+router.get('/posts/:userId', authMiddleware, async (req, res) => {
+  const { user } = res.locals;
+
   try {
     const posts = await Posts.findAll({
-      where: { userId: req.locals.user.userId },
+      where: { UserId: user.userId },
     });
 
     res.status(200).json({ message: '사용자 게시글 조회 완료', posts });
@@ -39,4 +42,15 @@ router.get('/posts', authMiddleware, async (req, res) => {
   }
 });
 
+// 모든 글 불러오기 API
+router.get('/posts', async (req, res) => {
+  try {
+    const allPosts = await Posts.findAll();
+
+    res.status(200).json({ message: '모든 글 조회 완료', allPosts });
+  } catch (error) {
+    console.log('🚀 ~ file: posts.js:50 ~ router.get ~ error:', error);
+    res.status(500).json({ message: '모든 글 조회 실패' });
+  }
+});
 module.exports = router;

@@ -23,7 +23,7 @@ const generateRefreshToken = (userId) => {
 router.post('/login', async (req, res) => {
   try {
     const { nickname, password } = req.body;
-    const { refreshToken } = req.cookies;
+    const { refreshToken, accessToken } = req.cookies;
 
     // Case 1: 처음 로그인하는 경우
     if (!refreshToken) {
@@ -43,13 +43,15 @@ router.post('/login', async (req, res) => {
         return res.status(401).json({ message: '잘못된 비밀번호.' });
       }
 
-      const accessToken = generateAccessToken(user.userId);
-      const refreshToken = generateRefreshToken(user.userId);
+      const newAccessToken = generateAccessToken(user.userId);
+      const newRefreshToken = generateRefreshToken(user.userId);
+
+      const userId = user.userId;
 
       return res
-        .cookie('accessToken', accessToken, { httpOnly: true })
-        .cookie('refreshToken', refreshToken, { httpOnly: true })
-        .json({ message: '로그인되었습니다.' });
+        .cookie('accessToken', newAccessToken, { httpOnly: true })
+        .cookie('refreshToken', newRefreshToken, { httpOnly: true })
+        .json({ userId, newAccessToken, message: '로그인되었습니다.' });
     }
 
     // Case 2: Access Token과 Refresh Token 모두 만료된 경우
@@ -66,7 +68,11 @@ router.post('/login', async (req, res) => {
         return res
           .cookie('accessToken', newAccessToken, { httpOnly: true })
           .cookie('refreshToken', newRefreshToken, { httpOnly: true })
-          .json({ message: 'ACCESS TOKEN과 REFRESH TOKEN이 갱신되었습니다.' });
+          .json({
+            userId,
+            newAccessToken,
+            message: 'ACCESS TOKEN과 REFRESH TOKEN이 갱신되었습니다.',
+          });
       }
     }
 
@@ -82,7 +88,11 @@ router.post('/login', async (req, res) => {
 
         return res
           .cookie('accessToken', newAccessToken, { httpOnly: true })
-          .json({ message: 'ACCESS TOKEN이 갱신되었습니다.' });
+          .json({
+            userId,
+            newAccessToken,
+            message: 'ACCESS TOKEN이 갱신되었습니다.',
+          });
       }
     }
 
@@ -98,7 +108,11 @@ router.post('/login', async (req, res) => {
 
         return res
           .cookie('refreshToken', newRefreshToken, { httpOnly: true })
-          .json({ message: 'REFRESH TOKEN이 갱신되었습니다.' });
+          .json({
+            userId,
+            accessToken,
+            message: 'REFRESH TOKEN이 갱신되었습니다.',
+          });
       }
     }
 
@@ -109,6 +123,7 @@ router.post('/login', async (req, res) => {
       console.log('5');
       res.status(201).json({
         userId,
+        accessToken,
         message: 'ACCESS TOKEN과 REFRESH TOKEN이 모두 유효합니다.',
       });
     }

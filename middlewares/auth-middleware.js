@@ -22,8 +22,13 @@ const authMiddleware = async (req, res, next) => {
       });
     }
     res.locals.user = user;
+    // console.log(
+    //   '🚀 ~ file: auth-middleware.js:25 ~ authMiddleware ~ res.locals.user:',
+    //   res.locals.user
+    // );
     // res.locals는 express에서 제공되는 특별한 객체.
     // res.locals에 저장된 변수들은 요청됐을 때만 유효
+
     next();
   } catch (error) {
     console.log(
